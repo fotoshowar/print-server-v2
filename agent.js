@@ -61,13 +61,14 @@ const MAX_RECONNECT_ATTEMPTS = 10;
 // =================== CONEXIÓN AL SERVIDOR ===================
 
 function connectToServer() {
-    const wsUrl = `${CONFIG.SERVER_URL.replace('https://', 'wss://').replace('http://', 'ws://')}/socket.io/`;
+    const wsUrl = CONFIG.SERVER_URL.replace('https://', 'wss://').replace('http://', 'ws://');
 
-    log(`Conectando a: ${wsUrl}`, 'info');
+    log(`Conectando a: ${wsUrl} (path: /print/socket.io/)`, 'info');
     log(`Client ID: ${CONFIG.CLIENT_ID}`, 'info');
     log(`Impresora: ${CONFIG.PRINTER_NAME}`, 'info');
 
     socket = io(wsUrl, {
+        path: '/print/socket.io/',
         reconnection: true,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 10000,
