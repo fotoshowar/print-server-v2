@@ -16,6 +16,12 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Detectar usuario actual (quien ejecutó sudo)
+APP_USER="${SUDO_USER:-$(whoami)}"
+if [ "$APP_USER" = "root" ] && [ -n "$SUDO_USER" ]; then
+    APP_USER="$SUDO_USER"
+fi
+
 # Función para imprimir mensajes
 print_info() {
     echo -e "${GREEN}ℹ️  $1${NC}"
@@ -68,8 +74,8 @@ apt install -y cups printer-driver-escpr
 systemctl enable cups
 systemctl start cups
 
-# Agregar usuario pi al grupo lpadmin
-usermod -a -G lpadmin pi 2>/dev/null || true
+# Agregar usuario actual al grupo lpadmin
+usermod -a -G lpadmin "$APP_USER" 2>/dev/null || true
 
 print_success "CUPS instalado y configurado"
 
@@ -162,7 +168,7 @@ print_success "Dependencias instaladas"
 # 10. Crear servicio systemd
 print_info "Creando servicio systemd..."
 
-cat > /etc/systemd/system/fotoshow-print-agent.service << 'EOF'
+cat > /etc/systemd/system/fotoshow-print-agent.service << EOF
 [Unit]
 Description=FotoShow Print Agent
 Documentation=https://github.com/fotoshowar/print-server-v2
@@ -170,7 +176,7 @@ After=network.target
 
 [Service]
 Type=simple
-User=pi
+User=$APP_USER
 WorkingDirectory=/opt/fotoshow-print-agent
 ExecStart=/usr/bin/node agent.js
 Restart=always
@@ -199,7 +205,7 @@ print_success "Servicio habilitado"
 
 # 12. Configurar permisos
 print_info "Configurando permisos..."
-chown -R pi:pi /opt/fotoshow-print-agent
+chown -R "$APP_USER:$APP_USER" /opt/fotoshow-print-agent
 print_success "Permisos configurados"
 
 # 13. Preguntar por el nombre de la impresora CUPS
