@@ -60,9 +60,9 @@ NPM_VERSION=$(npm --version)
 print_success "Node.js instalado: $NODE_VERSION"
 print_success "npm instalado: $NPM_VERSION"
 
-# 5. Instalar CUPS
+# 5. Instalar CUPS (sin cups-pdf, está obsoleto)
 print_info "Instalando CUPS..."
-apt install -y cups cups-pdf printer-driver-escpr
+apt install -y cups printer-driver-escpr
 
 # Habilitar CUPS
 systemctl enable cups
@@ -145,7 +145,7 @@ print_info "Descargando agent.js..."
 # Intentar descargar desde el servidor
 if curl -fsSL https://fotoshow.online/print/agent.js -o agent.js 2>/dev/null; then
     print_success "agent.js descargado del servidor"
-elif curl -fsSL https://raw.githubusercontent.com/fotoshowar/print-agent/main/agent.js -o agent.js 2>/dev/null; then
+elif curl -fsSL https://raw.githubusercontent.com/fotoshowar/print-server-v2/main/agent.js -o agent.js 2>/dev/null; then
     print_success "agent.js descargado de GitHub"
 else
     print_error "No se pudo descargar agent.js"
@@ -165,7 +165,7 @@ print_info "Creando servicio systemd..."
 cat > /etc/systemd/system/fotoshow-print-agent.service << 'EOF'
 [Unit]
 Description=FotoShow Print Agent
-Documentation=https://github.com/fotoshowar/print-agent
+Documentation=https://github.com/fotoshowar/print-server-v2
 After=network.target
 
 [Service]
