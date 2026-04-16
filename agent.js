@@ -242,8 +242,26 @@ function printImage(imagePath, options) {
 
         log(`   🖨️ Imprimiendo en: ${printerName}`, 'info');
 
+        // Mapeo de tipos de papel a opciones CUPS
+        const paperTypeMap = {
+            'glossy': 'Glossy',
+            'normal': 'Plain',
+            'matte': 'Matte'
+        };
+
+        // Extraer paper_type de las opciones
+        const paperType = options?.paper_type || 'normal';
+        const cupsMediaType = paperTypeMap[paperType] || 'Plain';
+
+        log(`   📄 Tipo de papel: ${paperType} (CUPS: ${cupsMediaType})`, 'info');
+
         // Comando lp para imprimir con CUPS
-        const command = `lp -d "${printerName}" "${imagePath}"`;
+        // Incluir opciones de media type si se especificó papel
+        let command = `lp -d "${printerName}"`;
+        if (paperType && paperTypeMap[paperType]) {
+            command += ` -o media=${cupsMediaType}`;
+        }
+        command += ` "${imagePath}"`;
 
         exec(command, (error, stdout, stderr) => {
             if (error) {
